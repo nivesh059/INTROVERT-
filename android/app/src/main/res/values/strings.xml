@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">INTROVERT</string>
+    <string name="title_activity_main">INTROVERT</string>
+    <string name="package_name">com.introvert.voice</string>
+    <string name="custom_url_scheme">com.introvert.voice</string>
+</resources>

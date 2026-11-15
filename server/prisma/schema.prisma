@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+ id String @id @default(cuid())
+ username String @unique
+ email String @unique
+ passwordHash String
+ bio String @default("")
+ country String @default("IN")
+ coins Int @default(0)
+ vipUntil DateTime?
+ createdAt DateTime @default(now())
+ memberships Membership[]
+ messages Message[]
+ sentGifts GiftTransaction[] @relation("GiftSender")
+ notifications Notification[]
+ sentRequests Friendship[] @relation("FriendFrom")
+ receivedRequests Friendship[] @relation("FriendTo")
+ following Follow[] @relation("FollowFrom")
+ followers Follow[] @relation("FollowTo")
+ ledger WalletLedger[]
+}
+model Room {
+ id String @id @default(cuid())
+ name String
+ country String @default("IN")
+ isPrivate Boolean @default(false)
+ theme String @default("purple")
+ hostId String
+ createdAt DateTime @default(now())
+ memberships Membership[]
+ messages Message[]
+}
+model Membership {
+ id String @id @default(cuid())
+ userId String
+ roomId String
+ role String @default("SPEAKER")
+ joinedAt DateTime @default(now())
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ room Room @relation(fields:[roomId],references:[id],onDelete:Cascade)
+ @@unique([userId,roomId])
+}
+model Message {
+ id String @id @default(cuid())
+ body String
+ userId String
+ roomId String
+ createdAt DateTime @default(now())
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ room Room @relation(fields:[roomId],references:[id],onDelete:Cascade)
+}
+model Friendship {
+ id String @id @default(cuid())
+ fromId String
+ toId String
+ status String @default("PENDING")
+ from User @relation("FriendFrom",fields:[fromId],references:[id],onDelete:Cascade)
+ to User @relation("FriendTo",fields:[toId],references:[id],onDelete:Cascade)
+ @@unique([fromId,toId])
+}
+model Follow {
+ id String @id @default(cuid())
+ fromId String
+ toId String
+ from User @relation("FollowFrom",fields:[fromId],references:[id],onDelete:Cascade)
+ to User @relation("FollowTo",fields:[toId],references:[id],onDelete:Cascade)
+ @@unique([fromId,toId])
+}
+model WalletLedger {
+ id String @id @default(cuid())
+ userId String
+ amount Int
+ reason String
+ createdAt DateTime @default(now())
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+}
+model Gift {
+ id String @id @default(cuid())
+ name String
+ cost Int
+ icon String @default("🎁")
+}
+model GiftTransaction {
+ id String @id @default(cuid())
+ senderId String
+ receiverId String
+ giftId String
+ createdAt DateTime @default(now())
+ sender User @relation("GiftSender",fields:[senderId],references:[id])
+}
+model Notification {
+ id String @id @default(cuid())
+ userId String
+ body String
+ read Boolean @default(false)
+ createdAt DateTime @default(now())
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+}
