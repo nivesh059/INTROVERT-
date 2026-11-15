@@ -63,6 +63,8 @@ jobs:
         run: npm ci
 
       - name: Build website
+        env:
+          VITE_API_URL: https://introvert-api.onrender.com
         run: npm run build
 
       - name: Sync Android
