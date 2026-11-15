@@ -1,0 +1,42 @@
+name: INTROVERT Database Migration
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/generate-migration.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate PostgreSQL migration
+        working-directory: server
+        run: |
+          npm install --no-save prisma@5.22.0
+          mkdir -p prisma/migrations/20261115000000_init
+          npx prisma migrate diff \
+            --from-empty \
+            --to-schema-datamodel prisma/schema.prisma \
+            --script > prisma/migrations/20261115000000_init/migration.sql
+          test -s prisma/migrations/20261115000000_init/migration.sql
+          echo 'provider = "postgresql"' > prisma/migrations/migration_lock.toml
+          wc -l prisma/migrations/20261115000000_init/migration.sql
+
+      - name: Upload migration artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: INTROVERT-Database-Migration
+          path: server/prisma/migrations/
+          if-no-files-found: error
