@@ -89,3 +89,5 @@ The workflow builds the Android wrapper; backend hosting and PostgreSQL hosting 
 5. Configure LiveKit allowed origins / deployment settings.
 6. Add privacy policy, terms, community guidelines, age policy and account deletion.
 7. Complete security, load, abuse and payment testing before public release.
+# INTROVERT-
+Social Voice Chat Application
